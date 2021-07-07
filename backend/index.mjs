@@ -25,7 +25,7 @@ mongoose
   );
 
 const app = express();
-// Middlewares se plaçant entre modules, fonctions, etc. :
+// Middlewares se plaçant entre modules et fonctions :
 app.use(express.json()); // Permet de recevoir des corps de requête en JSON
 app.use(helmet()); // Module de sécurité évitant certaines formes d'attaques
 // Permission CORS
@@ -42,5 +42,6 @@ app.post("/api/auth/signup", (req, res, next) => {
   res.status(200).json({ message: "test" });
 });
 
+// Connexion au port backend
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Serveur actif sur le port " + PORT)); // Le serveur Node va tourner continuellement

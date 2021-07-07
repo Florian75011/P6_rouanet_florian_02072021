@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "P6_backend du parcours développeur d'OpenClassRooms",
   "version": "1.0.0",
-  "description": "",
+  "description": "Construisez une API sécurisée pour une application d'avis gastronomiques",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
