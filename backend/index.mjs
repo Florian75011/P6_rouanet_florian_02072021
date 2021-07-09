@@ -2,6 +2,8 @@ import express from "express";
 import helmet from "helmet";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { signUp } from "./routes/auth.mjs";
+import { checkAuthParams } from "./routes/auth.mjs";
 
 dotenv.config(); // Variable d'environnement
 console.log(process.env.PORT);
@@ -36,23 +38,21 @@ app.use((req, res, next) => {
     next();
 });
 
-// TEST de connexion
-app.post("/api/auth/signup", (req, res, next) => {
-  console.log(req.body);
-  res.status(200).json({ message: "test" });
-});
+app.post("/api/auth/signup", checkAuthParams, signUp);
 
 // Connexion au port backend
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Serveur actif sur le port " + PORT)); // Le serveur Node va tourner continuellement
 
 /*
-    "bcrypt": "^5.0.1",
+    // // TEST de connexion
+    // app.post("/api/auth/signup", (req, res, next) => {
+    //   console.log(req.body);
+    //   res.status(200).json({ message: "test" });
+    // });
+    
     "body-parser": "^1.19.0",
-    "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.12.13",
-    "mongoose-unique-validator": "^2.0.3",
     "multer": "^1.4.2"
 
     app.post("/api/auth/signup", (req, res, next) => {
