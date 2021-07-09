@@ -44,13 +44,7 @@ app.post("/api/auth/signup", checkAuthParams, signUp);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Serveur actif sur le port " + PORT)); // Le serveur Node va tourner continuellement
 
-/*
-    // // TEST de connexion
-    // app.post("/api/auth/signup", (req, res, next) => {
-    //   console.log(req.body);
-    //   res.status(200).json({ message: "test" });
-    // });
-    
+/*  
     "body-parser": "^1.19.0",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.2"
