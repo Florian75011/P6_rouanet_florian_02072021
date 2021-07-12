@@ -31,6 +31,7 @@ export function checkAuthParams(req, res, next) {
   }
 }
 
+// Regex pour email et MDP
 function isValidEmail(value) {
   if (
     /\S+@\S+\.\S+/.test(value) &&
@@ -42,8 +43,7 @@ function isValidEmail(value) {
 }
 
 function isValidPassword(value) {
-  // Regex pour renforcer le MDP
-  const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,}$/;
+  const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,}$/; // Regex pour renforcer le MDP
   return re.test(value);
 }
 
@@ -73,7 +73,10 @@ export async function signUp(req, res, next) {
 // Vérifie les informations d'identification de l'utilisateur, en renvoyant l'identifiant userID depuis la base de données
 // et un jeton Web JSON signé (contenant également l'identifiant userID)
         
-/*
+// Utilisation de la fonction sign et login, encode un nouveau token
+var jwt = require('jsonwebtoken');
+var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+
 // Exemple de construction du logIn
 // Controlleur user P6. Fonction pour connecter des utilisateurs existants. Contrôle du bon mot de passe taper par l'user.
 exports.login = (req, res, next) => {
@@ -90,22 +93,23 @@ exports.login = (req, res, next) => {
             }
             res.status(200).json({
             userId: user._id,
-            // Crée et vérifier token d'authentication
+            // Crée et vérifier token d'authentication vérifiant l'utilisateur
             token: jwt.sign(
+                // Chaîne secrète temporaire mute en chaîne aléatoire
                 { userId: user._id },
                 'RANDOM_TOKEN_SECRET',
                 // La validité du token ne dure qu'une journée, déconnexion automatique
                 { expiresIn: '24h' }
             )
             });
-        })
+        }) // Renvoie du token au front-end avec la réponse
         .catch(error => res.status(500).json({ error }));
     })
     .catch(error => res.status(500).json({ error }));
 };
 // Token d'identification pour terminer cette partie
 
-
+/*
 const express = require('express');
 const router = express.Router();
 const userCtrl = require('../controllers/user');
@@ -118,4 +122,3 @@ const userRoutes = require('./routes/user');
 app.use('/api/stuff', stuffRoutes);
 app.use('/api/auth', userRoutes);
 */
-   
