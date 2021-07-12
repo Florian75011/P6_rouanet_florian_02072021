@@ -102,7 +102,7 @@ exports.login = (req, res, next) => {
                 { expiresIn: '24h' }
             )
             });
-        }) // Renvoie du token au front-end avec la réponse
+        }) // Renvoie
         .catch(error => res.status(500).json({ error }));
     })
     .catch(error => res.status(500).json({ error }));
