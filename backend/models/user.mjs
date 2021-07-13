@@ -9,5 +9,4 @@ const userSchema = mongoose.Schema({
 })
 userSchema.plugin(uniqueValidator, { message: "Le champ {PATH} doit être unique" }); // Un "app.use" permettant d'user d'une clé unique
 
-// export const User = mongoose.model('User', userSchema);
 export default mongoose.model('User', userSchema);

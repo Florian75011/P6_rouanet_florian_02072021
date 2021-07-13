@@ -4,9 +4,11 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { signUp } from "./routes/auth.mjs";
 import { checkAuthParams } from "./routes/auth.mjs";
+import { logIn } from "./routes/auth.mjs";
+import { getAllSauces } from "./routes/sauces.mjs";
+import { auth } from "./middlewares/auth.mjs";
 
 dotenv.config(); // Variable d'environnement
-console.log(process.env.PORT);
 
 // Connexion à MongoDB sécurisée / COURS : https://openclassrooms.com/fr/courses/6390246-passez-au-full-stack-avec-node-js-express-et-mongodb/6466348-configurez-votre-base-de-donnees
 mongoose
@@ -39,6 +41,9 @@ app.use((req, res, next) => {
 });
 
 app.post("/api/auth/signup", checkAuthParams, signUp);
+app.post("/api/auth/login", checkAuthParams, logIn);
+app.get("/api/sauces", auth, getAllSauces);
+
 
 // Connexion au port backend
 const PORT = process.env.PORT || 3000;
