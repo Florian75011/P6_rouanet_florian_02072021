@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import { signUp } from "./routes/auth.mjs";
 import { checkAuthParams } from "./routes/auth.mjs";
 import { logIn } from "./routes/auth.mjs";
-import { getAllSauces } from "./routes/sauces.mjs";
+import * as sauce from "./routes/sauces.mjs";
 import { auth } from "./middlewares/auth.mjs";
 
 dotenv.config(); // Variable d'environnement
@@ -40,10 +40,14 @@ app.use((req, res, next) => {
     next();
 });
 
+// Création de la route API
 app.post("/api/auth/signup", checkAuthParams, signUp);
 app.post("/api/auth/login", checkAuthParams, logIn);
-app.get("/api/sauces", auth, getAllSauces);
-
+app.get("/api/sauces", auth, sauce.getAll);
+// app.get("/api/sauces/:id", );
+app.post("/api/sauces", auth, sauce.create);
+// app.put("/api/sauces/:id", );
+// app.delete("/api/sauces/:id, ");
 
 // Connexion au port backend
 const PORT = process.env.PORT || 3000;

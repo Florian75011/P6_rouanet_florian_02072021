@@ -17,6 +17,7 @@ const sauceSchema = mongoose.Schema({
 })
 
 
-export default mongoose.model('Sauce', sauceSchema);
+
+export default mongoose.model('Sauce', sauceSchema); // Créer un modèle de ce qui est au-dessus
 
 // 4 routes CRUD + vérif du même gars qui fait en ligne (création de sauce, update, reception de sauce, delecte)
