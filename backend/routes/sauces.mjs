@@ -1,55 +1,84 @@
+import { isOwner } from "../middlewares/auth.mjs";
 import Sauce from "../models/sauce.mjs";
+import fs from "fs";
 
+// Récupère toutes les sauces
 export async function getAll(req, res, next) {
-  // getAllSauce
   try {
     const sauces = await Sauce.find({}); // Trouve les sauces de l'API
     // Authentification avant de permettre l'ajout
-    console.log(sauces);
     res.status(200).json(sauces);
   } catch (err) {
     res.status(500).json({ message: "Une erreur s'est produite" });
   }
 }
 
-export async function create(req, res, next) {
-  const userId = req.body.decodedUserId; // Récupération de l'userId de l'utilisateur qui fait la requête
-  const sauce = new Sauce({
-    userId: "",
-    name: req.body.sauce.name,
-    manufacturer: "",
-    description: "",
-    mainPepper: "",
-    imageUrl: "",
-    heat: 0,
-    likes: 0,
-    dislikes: 0,
-    userLiked: [""],
-    userDisliked: [""],
-    auth,
-  });
+// Récupère une sauce crée
+export async function getOne(req, res, next) {
+  try {
+    const findSauce = await Sauce.findOne({ _id: req.params.id });
+    if (findSauce) {
+      res.status(200).json(findSauce);
+    } else {
+      res.status(404).json({ message: "Sauce introuvable" });
+    }
+  } catch (err) {
+    res.status(500).json({ message: "Une erreur s'est produite" });
+  }
 }
 
-// Modifier les routes pour prendre en compte les Fichiers
+// Crée une nouvelle sauce
+export async function create(req, res, next) {
+  try {
+    if (req.body.sauce) {
+      const obj = JSON.parse(req.body.sauce);
+      obj.imageUrl = `${req.protocol}://${req.get("host")}/${req.file.path}`; // Multer va prendre le champ image pour en extraire le fichier et l'enregistrer sur le serveur puis glisser ce qui est chargé dans req.file
+      const sauce = new Sauce(obj);
+      await sauce.save(); // Mongoose sauvegarde le fichier
+      res.status(201).json({ message: "Sauce crée" });
+    } else {
+      res.status(400).json({ message: "Paramètre invalide" });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Une erreur s'est produite" });
+  }
+}
 
 /*
-Doc
-{ sauce : Chaîne,
-image : Fichier }
-
-{ message : Chaîne }
-
-Capture et enregistre l'image, analyse la sauce en utilisant
-une chaîne de caractères et l'enregistre dans la base de données,
-en définissant correctement son image URL. Remet les sauces aimées
-et celles détestées à 0, et les sauces usersliked et celles
-usersdisliked aux tableaux vides.
-
-export async function getAllSauces() {
+// Possibilité de modificication d'une sauce
+export async function deleteOne(req, res, next) {
     try {
-
+        
     } catch (err) {
         res.status(500).json({ message: "Une erreur s'est produite" });
     }
-}
 */
+
+// Possibilité de suppression d'une sauce
+export async function deleteOne(req, res, next) {
+    try {
+      const findSauce = await Sauce.findOne({ _id: req.params.id });
+      if (findSauce) {
+        // Vérifier que la sauce appartient à l'utilisateur
+        if (isOwner(req, res, findSauce.userId)) { // On récupère la sauce ajoutée par rapport à l'ID concerné
+        // Supprimer l'image avant
+        const imagePath = findSauce.imageUrl.split(req.get("host") + "/")[1]; // Récupérer le chemin vers l'image
+        // console.log(imagePath);
+        fs.unlink(imagePath, async (err) => {  // fonction FS (Node) de suppression
+            if (err) throw err; // Renvoie une éventuelle erreur classique en callback
+        // Supprimer la sauce entière
+            await Sauce.deleteOne({ _id: req.params.id });
+        res.status(200).json({ message: "Sauce supprimée"});
+        })
+        } else {
+            res.status(403).json({ message: "Action non authorisée" }); // L'utilisateur est connecté mais n'a pas accès à la sauce
+        }
+      } else {
+        res.status(404).json({ message: "Sauce introuvable" });
+      }
+    } catch (err) {
+        // console.log(err);
+      res.status(500).json({ message: "Une erreur s'est produite" });
+    }
+  }

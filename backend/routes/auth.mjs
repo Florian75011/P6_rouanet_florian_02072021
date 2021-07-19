@@ -80,7 +80,7 @@ export async function logIn(req, res, next) {
         // Créer le token, et envoyer une réponse
         const obj = { // Créer un objet
           userId: "" + searchUser._id, // Contenu d'un jeton: user de la doc API + ID de MongoDB
-          token: jwt.sign({ data: {userId: searchUser._id} }, process.env.TOKEN_SECRET, { expiresIn: '24h' }) // L'utilisateur existe vraiment, donc on lui renvoie un jeton/token ; Crypte information pour la décrypter ensuite
+          token: jwt.sign({ userId: searchUser._id }, process.env.TOKEN_SECRET, { expiresIn: '24h' }) // L'utilisateur existe vraiment, donc on lui renvoie un jeton/token ; Crypte information pour la décrypter ensuite
         }
         console.log(obj);
         res.status(200).json(obj);

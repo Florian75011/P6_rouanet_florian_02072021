@@ -4,30 +4,51 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export function auth(req, res, next) {
-    console.log("request:", req);
+  // console.log("request:", req);
   // Export rend accessible la fonction dans tout le dossier
   try {
     let isConnected = false; // Variable reste sur faux à la base
-    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) { 
-        // console.log(req.headers);
-        const token = req.headers.authorization.split(" ")[1];
-        const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET); // Jwt vérifie le token et le réutilise
-        // req.body.decodedUserId = decodedToken.userId;
-        // const userId = decodedToken.userId; // L'ID se place à l'intérieur du Token s'il n'y a pas de problème
-        if (decodedToken != undefined) {
-            isConnected = true; // En cas de bon fonctionnement
-        }
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer ")
+    ) {
+      // console.log(req.headers);
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET); // Jwt vérifie le token et le réutilise
+      // req.body.decodedUserId = decodedToken.userId;
+      // const userId = decodedToken.userId; // L'ID se place à l'intérieur du Token s'il n'y a pas de problème
+      if (decodedToken != undefined) {
+        isConnected = true; // En cas de bon fonctionnement
+      }
     }
-    if (isConnected) { // Nouveau if si on est bien "isConnected"
-        next();
+    if (isConnected) {
+      // Nouveau if si on est bien "isConnected"
+      next();
     } else {
-        res.status(401).json(new Error("Pas connecté"));
+      res.status(401).json(new Error("Pas connecté"));
     }
-
   } catch (err) {
     console.log(err);
     res.status(401).json({
       error: new Error("Invalid request!"),
     });
+  }
+}
+
+export function isOwner(req, res, checkUserId) {
+  // Fonction de vérification de l'user
+  try {
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer ")
+    ) {
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.decode(token, process.env.TOKEN_SECRET); // Jwt récupère le contenu du token avec .decode
+      return decodedToken.userId === checkUserId; // L'ID dans le Token a-t-il le même ID que celui dans la sauce ajoutée, renvoie true ou false
+    } else {
+      throw new Error("Token manquant");
+    }
+  } catch (err) {
+    throw err; // Minimiser les sorties d'erreur pour ne pas encombrer la boîte (petite transmission de l'erreur au parent deleteOne)
   }
 }

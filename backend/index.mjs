@@ -7,6 +7,9 @@ import { checkAuthParams } from "./routes/auth.mjs";
 import { logIn } from "./routes/auth.mjs";
 import * as sauce from "./routes/sauces.mjs";
 import { auth } from "./middlewares/auth.mjs";
+import { upload } from "./middlewares/upload.mjs";
+import path, { dirname } from "path"; // Module Node pour gérer les chemins de fichiers
+import { fileURLToPath } from 'url';
 
 dotenv.config(); // Variable d'environnement
 
@@ -40,38 +43,19 @@ app.use((req, res, next) => {
     next();
 });
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+app.use('/images', express.static(path.join(__dirname, 'images'))); // Indique que le dossier possède des fichiers statiques
+
 // Création de la route API
 app.post("/api/auth/signup", checkAuthParams, signUp);
 app.post("/api/auth/login", checkAuthParams, logIn);
 app.get("/api/sauces", auth, sauce.getAll);
-// app.get("/api/sauces/:id", );
-app.post("/api/sauces", auth, sauce.create);
+app.get("/api/sauces/:id", auth, sauce.getOne);
+app.post("/api/sauces", auth, upload, sauce.create);
 // app.put("/api/sauces/:id", );
-// app.delete("/api/sauces/:id, ");
+app.delete("/api/sauces/:id", auth, sauce.deleteOne);
 
 // Connexion au port backend
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("Serveur actif sur le port " + PORT)); // Le serveur Node va tourner continuellement
-
-/*
-    // // TEST de connexion
-    // app.post("/api/auth/signup", (req, res, next) => {
-    //   console.log(req.body);
-    //   res.status(200).json({ message: "test" });
-    // });
-    
-    "body-parser": "^1.19.0",
-    "jsonwebtoken": "^8.5.1",
-    "multer": "^1.4.2"
-
-    app.post("/api/auth/signup", (req, res, next) => {
-    delete_req.body.id;
-    const thing = new Thing({
-      ...req.body,
-    });
-    thing
-      .save()
-      .then(() => res.status(201).json({ message: "Objet enregistré" }))
-      .catch((error) => res.status(400).json({ error }));
-  });
-*/
