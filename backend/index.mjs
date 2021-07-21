@@ -9,7 +9,7 @@ import * as sauce from "./routes/sauces.mjs";
 import { auth } from "./middlewares/auth.mjs";
 import { upload } from "./middlewares/upload.mjs";
 import path, { dirname } from "path"; // Module Node pour gérer les chemins de fichiers
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from "url";
 
 dotenv.config(); // Variable d'environnement
 
@@ -37,15 +37,21 @@ app.use(express.json()); // Permet de recevoir des corps de requête en JSON
 app.use(helmet()); // Module de sécurité évitant certaines formes d'attaques
 // Tuto middleware appliqué à toutes les routes avec permission CORS (de base empêche les requêtes malveillantes d'accéder à des ressources)
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*'); // Tout le monde a le droit d'accéder à l'API
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization'); // Authorisation d'utiliser certaines en-têtes
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS'); // Authorisation d'utiliser certaines méthodes
-    next();
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Tout le monde a le droit d'accéder à l'API
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+  ); // Authorisation d'utiliser certaines en-têtes
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+  ); // Authorisation d'utiliser certaines méthodes
+  next();
 });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-app.use('/images', express.static(path.join(__dirname, 'images'))); // Indique que le dossier possède des fichiers statiques
+app.use("/images", express.static(path.join(__dirname, "images"))); // Indique que le dossier possède des fichiers statiques
 
 // Création de la route API
 app.post("/api/auth/signup", checkAuthParams, signUp);
@@ -53,7 +59,8 @@ app.post("/api/auth/login", checkAuthParams, logIn);
 app.get("/api/sauces", auth, sauce.getAll);
 app.get("/api/sauces/:id", auth, sauce.getOne);
 app.post("/api/sauces", auth, upload, sauce.create);
-// app.put("/api/sauces/:id", );
+// app.post("/api/sauces/:id/like", auth, sauce.like);
+app.put("/api/sauces/:id", auth, upload, sauce.updateOne);
 app.delete("/api/sauces/:id", auth, sauce.deleteOne);
 
 // Connexion au port backend

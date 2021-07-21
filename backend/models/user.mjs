@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import uniqueValidator from "mongoose-unique-validator";
 
-
 // Création d'un schéma à mail unique + MDP
 const userSchema = mongoose.Schema({
     email: { type: String, required: true, unique: true },
