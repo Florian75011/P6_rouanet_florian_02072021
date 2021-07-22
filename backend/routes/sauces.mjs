@@ -115,3 +115,47 @@ export async function deleteOne(req, res, next) {
     res.status(500).json({ message: "Une erreur s'est produite" });
   }
 }
+
+// + index.mjs:   app.post("/api/sauces/:id/like", auth, sauce.like);
+// Additionnel : gestion des likes
+export async function like(req, res, next) {
+  try {
+    const findSauce = await Sauce.findOne({ _id: req.params.id });
+    if (findSauce) {
+      // Au cas où il y a un paramètre manquant
+      if (req.body.userId && [-1, 0, 1].includes(req.body.like)) {
+        // tableau avec valeurs possibles des likes
+        // Retirer l'ID utilisateur des deux tableaux
+        findSauce.usersLiked = findSauce.usersLiked.filter((id) => {
+          // Fonction filter itère sur le tableau usersLiked
+          return id != req.body.userId; // ID différente ajoutée au tableau filtrée, id supprimé de la liste
+        });
+        findSauce.usersDisliked = findSauce.usersDisliked.filter((id) => {
+          // Fonction filter itère sur le tableau usersLiked
+          return id != req.body.userId; // ID différente ajoutée au tableau filtrée, id supprimé de la liste
+        });
+        // Ajouter dans liste appropriée (ou pas)
+        if (req.body.like == 1) {
+          findSauce.usersLiked.push(req.body.userId); // 1 userID ne peut liker qu'une fois
+        }
+        if (req.body.like == -1) {
+          findSauce.usersDisliked.push(req.body.userId); // 1 userID ne peut disliker qu'une fois
+        }
+        // Mettre à jour les compteur
+        findSauce.likes = findSauce.usersLiked.length;
+        findSauce.dislikes = findSauce.usersDisliked.length;
+        await Sauce.updateOne({ _id: req.params.id }, findSauce); // Maj de la sauce effective
+        res.status(200).json({ message: "Sauce modifiée" });
+      } else {
+        res.status(400).json({ message: "Paramètre manquant ou invalide" });
+      }
+    } else {
+      res.status(404).json({ message: "Sauce introuvable" });
+    }
+  } catch (err) {
+    res.status(500).json({ message: "Une erreur s'est produite" });
+  }
+}
+
+// console.log(req.params, req.body);
+// console.log(req.file);

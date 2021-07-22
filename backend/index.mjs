@@ -59,7 +59,7 @@ app.post("/api/auth/login", checkAuthParams, logIn);
 app.get("/api/sauces", auth, sauce.getAll);
 app.get("/api/sauces/:id", auth, sauce.getOne);
 app.post("/api/sauces", auth, upload, sauce.create);
-// app.post("/api/sauces/:id/like", auth, sauce.like);
+app.post("/api/sauces/:id/like", auth, sauce.like);
 app.put("/api/sauces/:id", auth, upload, sauce.updateOne);
 app.delete("/api/sauces/:id", auth, sauce.deleteOne);
 
