@@ -3,22 +3,20 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// Fonction d'authentification globale afin de sécuriser chaque route
 export function auth(req, res, next) {
-  // console.log("request:", req);
   // Export rend accessible la fonction dans tout le dossier
   try {
     let isConnected = false; // Variable reste sur faux à la base
     if (
       req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer ")
+      req.headers.authorization.startsWith("Bearer ") // Si les deux sont ok, commencer par Bearer, puis :
     ) {
-      // console.log(req.headers);
+      // Le tableau d'un élément se place à l'intérieur du Token s'il n'y a pas de problème
       const token = req.headers.authorization.split(" ")[1];
-      const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET); // Jwt vérifie le token et le réutilise
-      // req.body.decodedUserId = decodedToken.userId;
-      // const userId = decodedToken.userId; // L'ID se place à l'intérieur du Token s'il n'y a pas de problème
+      const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET); // Jwt vérifie le token pour le réutiliser
       if (decodedToken != undefined) {
-        isConnected = true; // En cas de bon fonctionnement
+        isConnected = true; // En cas de bon fonctionnement on se connecte sinon cela renvoie un statut d'erreur
       }
     }
     if (isConnected) {
@@ -30,13 +28,14 @@ export function auth(req, res, next) {
   } catch (err) {
     console.log(err);
     res.status(401).json({
-      error: new Error("Invalid request!"),
+      error: new Error("Requête Invalide!"),
     });
   }
 }
 
+// Permet la modification/suppression d'élément (sauce) par quelqu'un branché sur son propre compte
 export function isOwner(req, res, checkUserId) {
-  // Fonction de vérification de l'user
+  // Fonction de vérification de l'utilisateur
   try {
     if (
       req.headers.authorization &&

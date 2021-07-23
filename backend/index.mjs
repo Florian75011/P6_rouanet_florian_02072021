@@ -16,6 +16,7 @@ dotenv.config(); // Variable d'environnement
 // Connexion à MongoDB sécurisée / COURS : https://openclassrooms.com/fr/courses/6390246-passez-au-full-stack-avec-node-js-express-et-mongodb/6466348-configurez-votre-base-de-donnees
 mongoose
   .connect(
+    // Gère la connexion de l'user en masquant les identifiants
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.moa2t.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
     {
       useNewUrlParser: true,
@@ -34,8 +35,8 @@ mongoose
 const app = express();
 // Middlewares se plaçant entre modules et fonctions :
 app.use(express.json()); // Permet de recevoir des corps de requête en JSON
-app.use(helmet()); // Module de sécurité évitant certaines formes d'attaques
-// Tuto middleware appliqué à toutes les routes avec permission CORS (de base empêche les requêtes malveillantes d'accéder à des ressources)
+app.use(helmet()); // Module de sécurité évitant certaines formes d'attaques informatiques courantes
+// Tuto middleware appliqué à toutes les routes avec permission CORS (de base on empêche les requêtes malveillantes d'accéder à des ressources)
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*"); // Tout le monde a le droit d'accéder à l'API
   res.setHeader(
@@ -49,6 +50,7 @@ app.use((req, res, next) => {
   next();
 });
 
+// Création de routes
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 app.use("/images", express.static(path.join(__dirname, "images"))); // Indique que le dossier possède des fichiers statiques

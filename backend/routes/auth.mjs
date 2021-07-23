@@ -1,20 +1,17 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import User from "../models/user.mjs";
+import User from "../models/user.mjs"; // import du modèle du User en modèle
 
 dotenv.config(); // Permet d'user des .env
 
-// Filtre avant la fonction signUp + Validation de les paramètres en backend par rapport au frontend + Vérif email/MDP pas vide
+// Filtre avant la fonction d'inscription/connexion + Validation des paramètres en backend par rapport au frontend + Vérif email/MDP non vide
 export function checkAuthParams(req, res, next) {
-  // console.log(req.body);
   if (
-    req.body.email &&
-    req.body.email !== "" &&
-    req.body.password &&
-    req.body.password !== ""
+    // On teste strictement les égalités/inégalités par rapport à la dataBase
+    req.body.email && req.body.email !== "" && req.body.password && req.body.password !== ""
   ) {
-    // Vérifier email
+    // Vérifier l'email
     if (!isValidEmail(req.body.email)) {
       res.status(400).json({ message: "Email non valide!" });
     }
@@ -23,6 +20,7 @@ export function checkAuthParams(req, res, next) {
       res.status(400).json({
         message:
           "Mot de passe non valide (6 caractères minimum, une majuscule, une minuscule, un chiffre et un caractère spécial)",
+          // Contraint à faire un MDP sécurisé
       });
     } else {
       next();
@@ -32,6 +30,7 @@ export function checkAuthParams(req, res, next) {
   }
 }
 
+// REGEX pour que les critères correspondent au champ en fortifiant email & MDP
 function isValidEmail(value) {
   if (
     /\S+@\S+\.\S+/.test(value) &&
@@ -42,8 +41,8 @@ function isValidEmail(value) {
   return false;
 }
 
+// Regex pour renforcer le MDP
 function isValidPassword(value) {
-  // Regex pour renforcer le MDP
   const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,}$/;
   return re.test(value);
 }
@@ -65,11 +64,11 @@ export async function signUp(req, res, next) {
   }
 }
 
-// Gestion du log in du site
+// Gestion de la connexion au site avec recherche utilisateur
 export async function logIn(req, res, next) {
   try {
     // Vérifier que cet email existe
-    const searchUser = await User.findOne({ email: req.body.email }); // Fonction MongoDB qui récupère un élément ajouté au paramètre
+    const searchUser = await User.findOne({ email: req.body.email }); // Fonction MongoDB qui récupère l'élément ajouté au paramètre
     if (searchUser != null) {
       // Comparer les mots de passe
       const comparePassword = await bcrypt.compareSync(
@@ -78,10 +77,15 @@ export async function logIn(req, res, next) {
       ); // Renvoie true ou false
       if (comparePassword === true) {
         // Créer le token, et envoyer une réponse
-        const obj = { // Créer un objet
+        const obj = {
+          // Créer un objet prenant en compte un userId avec le résultat du searchUser + le token secret
           userId: "" + searchUser._id, // Contenu d'un jeton: user de la doc API + ID de MongoDB
-          token: jwt.sign({ userId: searchUser._id }, process.env.TOKEN_SECRET, { expiresIn: '24h' }) // L'utilisateur existe vraiment, donc on lui renvoie un jeton/token ; Crypte information pour la décrypter ensuite
-        }
+          token: jwt.sign(
+            { userId: searchUser._id },
+            process.env.TOKEN_SECRET,
+            { expiresIn: "24h" }
+          ), // L'utilisateur existe vraiment, donc on lui renvoie un jeton/token ; Crypte information pour la décrypter ensuite
+        };
         console.log(obj);
         res.status(200).json(obj);
       } else {
