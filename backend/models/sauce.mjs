@@ -9,7 +9,7 @@ const sauceSchema = mongoose.Schema({
   mainPepper: { type: String, required: true },
   imageUrl: { type: String, required: true }, // Lien et téléchargement de l'image
   heat: { type: Number, required: true },
-  likes: { type: Number, required: true, default: 0 }, // Initialise à zéro au nombre de like
+  likes: { type: Number, required: true, default: 0 }, // Initialise à zéro le nombre de like
   dislikes: { type: Number, required: true, default: 0 },
   usersLiked: { type: [String], required: true }, // Garde en mémoire qui a liké
   usersDisliked: { type: [String], required: true },

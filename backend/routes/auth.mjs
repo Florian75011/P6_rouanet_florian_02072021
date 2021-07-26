@@ -41,7 +41,7 @@ function isValidEmail(value) {
   return false;
 }
 
-// Regex pour renforcer le MDP
+// Regex pour renforcer le MDP (au moins 1 chiffre-majuscule-minuscule-alphanumérique, 6 charactères min)
 function isValidPassword(value) {
   const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,}$/;
   return re.test(value);
